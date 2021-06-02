@@ -25,17 +25,23 @@ class ImageCache {
     let queue = DispatchQueue(label: "cache")
 
     init() {
+        // allocate memory cache size
         images.totalCostLimit = memoryCacheSize()
+        
+        // make disck cache directory
         diskPath = mkdir()
     }
     
+    // save image
     func saveImage(image: UIImage, url: String) {
         guard let encodedUrl = url.percentEncoding() else { return }
         
-        cacheToMemory(image, encodedUrl)
-        cacheToDisk(image, encodedUrl)
+        // save to memory and disk
+        saveToMemory(image, encodedUrl)
+        saveToDisk(image, encodedUrl)
     }
     
+    // load image
     func loadImage(url: String, completion: @escaping ((UIImage?) -> Void) ) {
         
         guard let encodedUrl = url.percentEncoding() else {
@@ -46,15 +52,23 @@ class ImageCache {
         }
         
         //todo
-        
         DispatchQueue(label: "imagecache").async { [weak self] in
 
             if let image = self?.images.object(forKey: NSString(string: encodedUrl)) {
-                completion(image)
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            }
+            else {
+                let image = self?.loadFromDisk(NSString(string: encodedUrl))
+                DispatchQueue.main.async {
+                    completion(image)
+                }
             }
         }
     }
     
+    // need?
     func clearImages() {
         
         images.removeAllObjects()
@@ -75,12 +89,12 @@ class ImageCache {
 
     }
     
-    
-    private func cacheToMemory(_ image: UIImage, _ url: String) {
+// private function /////
+    private func saveToMemory(_ image: UIImage, _ url: String) {
         images.setObject(image, forKey: url as NSString)
     }
     
-    private func cacheToDisk(_ image: UIImage, _ url: String) {
+    private func saveToDisk(_ image: UIImage, _ url: String) {
         guard let cacheDefaultUrl = diskPath else {
             return
         }
