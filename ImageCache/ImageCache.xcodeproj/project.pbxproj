@@ -14,6 +14,7 @@
 		C2917CE32667BB1E002A4C2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2917CE22667BB1E002A4C2C /* Assets.xcassets */; };
 		C2917CE62667BB1E002A4C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C2917CE42667BB1E002A4C2C /* LaunchScreen.storyboard */; };
 		C2917CEF2667BB8E002A4C2C /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CEE2667BB8E002A4C2C /* ImageCache.swift */; };
+		C2917CF12667CCD8002A4C2C /* String+PercentEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		C2917CE52667BB1E002A4C2C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C2917CE72667BB1E002A4C2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2917CEE2667BB8E002A4C2C /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+PercentEncoding.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				C2917CEE2667BB8E002A4C2C /* ImageCache.swift */,
+				C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */,
 			);
 			path = cache;
 			sourceTree = "<group>";
@@ -148,6 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2917CF12667CCD8002A4C2C /* String+PercentEncoding.swift in Sources */,
 				C2917CDE2667BB1C002A4C2C /* ViewController.swift in Sources */,
 				C2917CDA2667BB1C002A4C2C /* AppDelegate.swift in Sources */,
 				C2917CEF2667BB8E002A4C2C /* ImageCache.swift in Sources */,

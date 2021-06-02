@@ -11,27 +11,56 @@ class ImageCache {
     
     public static let shared = ImageCache()
     
-    let queue = DispatchQueue(label: "cache")
-    var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
+    var memoryCacheSize = {
+        return 50 * 1024 * 1024 // 50MB
+    }
     
+    var disckCacheSize = {
+        return 100 * 1024 * 1024 // 100MB
+    }
+    
+    var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
+    var diskPath : URL?
+    
+    let queue = DispatchQueue(label: "cache")
+
     init() {
-        images.totalCostLimit = 50 * 1024 * 1024 // 50MB
+        images.totalCostLimit = memoryCacheSize()
+        diskPath = mkdir()
     }
     
     func saveImage(image: UIImage, url: String) {
-        cacheToMemory(image, url)
-        cacheToDisk(image, url)
+        guard let encodedUrl = url.percentEncoding() else { return }
+        
+        cacheToMemory(image, encodedUrl)
+        cacheToDisk(image, encodedUrl)
     }
     
-    func loadImage(url: String) {
+    func loadImage(url: String, completion: @escaping ((UIImage?) -> Void) ) {
+        
+        guard let encodedUrl = url.percentEncoding() else {
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            return
+        }
+        
+        //todo
+        
+        DispatchQueue(label: "imagecache").async { [weak self] in
+
+            if let image = self?.images.object(forKey: NSString(string: encodedUrl)) {
+                completion(image)
+            }
+        }
     }
     
-    open func clearImages() {
+    func clearImages() {
         
         images.removeAllObjects()
         
         let fileManager = FileManager.default
-        guard let cacheDefaultUrl = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+        guard let cacheDefaultUrl = diskPath else {
             return
         }
         
@@ -41,10 +70,9 @@ class ImageCache {
             } catch {
                 debugPrint(error.localizedDescription)
             }
-            
         }
-        
-        //workItems.removeAllObjects()
+        diskPath = nil
+
     }
     
     
@@ -53,7 +81,7 @@ class ImageCache {
     }
     
     private func cacheToDisk(_ image: UIImage, _ url: String) {
-        guard let cacheDefaultUrl = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+        guard let cacheDefaultUrl = diskPath else {
             return
         }
         
@@ -67,11 +95,44 @@ class ImageCache {
         }
     }
     
-    private func loadFromMemory() {
+    private func loadFromMemory(_ url: NSString) -> UIImage? {
+        return images.object(forKey: url)
         
     }
     
-    private func loadFromDisk() {
+    private func loadFromDisk(_ url: NSString) -> UIImage? {
+        //todo
+        return nil
+    }
+    
+    private func currentDiskCacheSize() -> Int64{
+        //todo
+        return 0
+    }
+    
+    private func mkdir() -> URL? {
+        let paths = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
         
+        if (paths.count <= 0) {
+            return nil
+        }
+        
+        let path = paths[0]
+        
+        guard let pathUrl = URL(string: path) else {
+            return nil
+        }
+
+        let fullPath = pathUrl.appendingPathComponent("cache")
+        if !FileManager.default.fileExists(atPath: fullPath.path) {
+            do {
+                try FileManager.default.createDirectory(atPath: fullPath.path, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print(error.localizedDescription)
+                return nil
+            }
+        }
+        
+        return fullPath
     }
 }
