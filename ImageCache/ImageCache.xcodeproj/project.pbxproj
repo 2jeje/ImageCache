@@ -15,6 +15,9 @@
 		C2917CE62667BB1E002A4C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C2917CE42667BB1E002A4C2C /* LaunchScreen.storyboard */; };
 		C2917CEF2667BB8E002A4C2C /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CEE2667BB8E002A4C2C /* ImageCache.swift */; };
 		C2917CF12667CCD8002A4C2C /* String+PercentEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */; };
+		C2917CF326686AFD002A4C2C /* ImageDisckCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CF226686AFD002A4C2C /* ImageDisckCache.swift */; };
+		C2917CF526686B76002A4C2C /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CF426686B76002A4C2C /* Cache.swift */; };
+		C2917CF726686D76002A4C2C /* ImageMemCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2917CF626686D76002A4C2C /* ImageMemCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +31,9 @@
 		C2917CE72667BB1E002A4C2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2917CEE2667BB8E002A4C2C /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+PercentEncoding.swift"; sourceTree = "<group>"; };
+		C2917CF226686AFD002A4C2C /* ImageDisckCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisckCache.swift; sourceTree = "<group>"; };
+		C2917CF426686B76002A4C2C /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		C2917CF626686D76002A4C2C /* ImageMemCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageMemCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +82,9 @@
 			isa = PBXGroup;
 			children = (
 				C2917CEE2667BB8E002A4C2C /* ImageCache.swift */,
+				C2917CF226686AFD002A4C2C /* ImageDisckCache.swift */,
+				C2917CF626686D76002A4C2C /* ImageMemCache.swift */,
+				C2917CF426686B76002A4C2C /* Cache.swift */,
 				C2917CF02667CCD8002A4C2C /* String+PercentEncoding.swift */,
 			);
 			path = cache;
@@ -151,8 +160,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2917CF526686B76002A4C2C /* Cache.swift in Sources */,
 				C2917CF12667CCD8002A4C2C /* String+PercentEncoding.swift in Sources */,
+				C2917CF326686AFD002A4C2C /* ImageDisckCache.swift in Sources */,
 				C2917CDE2667BB1C002A4C2C /* ViewController.swift in Sources */,
+				C2917CF726686D76002A4C2C /* ImageMemCache.swift in Sources */,
 				C2917CDA2667BB1C002A4C2C /* AppDelegate.swift in Sources */,
 				C2917CEF2667BB8E002A4C2C /* ImageCache.swift in Sources */,
 				C2917CDC2667BB1C002A4C2C /* SceneDelegate.swift in Sources */,

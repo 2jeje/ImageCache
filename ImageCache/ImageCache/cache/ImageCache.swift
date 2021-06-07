@@ -11,25 +11,12 @@ class ImageCache {
     
     public static let shared = ImageCache()
     
-    var memoryCacheSize = {
-        return 50 * 1024 * 1024 // 50MB
-    }
-    
-    var disckCacheSize = {
-        return 100 * 1024 * 1024 // 100MB
-    }
-    
-    var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
-    var diskPath : URL?
+    let diskCache = ImageDiskCache.shared
+    let memCache = ImageMemCache.shared
     
     let queue = DispatchQueue(label: "cache")
 
     init() {
-        // allocate memory cache size
-        images.totalCostLimit = memoryCacheSize()
-        
-        // make disck cache directory
-        diskPath = mkdir()
     }
     
     // save image
@@ -37,8 +24,8 @@ class ImageCache {
         guard let encodedUrl = url.percentEncoding() else { return }
         
         // save to memory and disk
-        saveToMemory(image, encodedUrl)
-        saveToDisk(image, encodedUrl)
+        memCache.saveToMemory(image: image, url: NSString(string: encodedUrl))
+        diskCache.saveToDisk(image: image,url: encodedUrl)
     }
     
     // load image
@@ -54,13 +41,13 @@ class ImageCache {
         //todo
         DispatchQueue(label: "imagecache").async { [weak self] in
 
-            if let image = self?.images.object(forKey: NSString(string: encodedUrl)) {
+            if let image = self?.memCache.loadFromMemory(url: NSString(string: encodedUrl)) {
                 DispatchQueue.main.async {
                     completion(image)
                 }
             }
             else {
-                let image = self?.loadFromDisk(NSString(string: encodedUrl))
+                let image = self?.diskCache.loadFromDisk(url :NSString(string: encodedUrl))
                 DispatchQueue.main.async {
                     completion(image)
                 }
@@ -71,82 +58,22 @@ class ImageCache {
     // need?
     func clearImages() {
         
-        images.removeAllObjects()
-        
-        let fileManager = FileManager.default
-        guard let cacheDefaultUrl = diskPath else {
-            return
-        }
-        
-        if fileManager.isDeletableFile(atPath: cacheDefaultUrl.path) {
-            do {
-                try fileManager.removeItem(atPath: cacheDefaultUrl.path)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        diskPath = nil
+//        images.removeAllObjects()
+//
+//        let fileManager = FileManager.default
+//        guard let cacheDefaultUrl = diskPath else {
+//            return
+//        }
+//
+//        if fileManager.isDeletableFile(atPath: cacheDefaultUrl.path) {
+//            do {
+//                try fileManager.removeItem(atPath: cacheDefaultUrl.path)
+//            } catch {
+//                debugPrint(error.localizedDescription)
+//            }
+//        }
+//        diskPath = nil
 
     }
-    
-// private function /////
-    private func saveToMemory(_ image: UIImage, _ url: String) {
-        images.setObject(image, forKey: url as NSString)
-    }
-    
-    private func saveToDisk(_ image: UIImage, _ url: String) {
-        guard let cacheDefaultUrl = diskPath else {
-            return
-        }
-        
-        let cacheUrl = cacheDefaultUrl.appendingPathComponent(url)
-        if let data = image.pngData() {
-            do {
-                try data.write(to: cacheUrl, options: Data.WritingOptions.atomic)
-            } catch let error {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-    
-    private func loadFromMemory(_ url: NSString) -> UIImage? {
-        return images.object(forKey: url)
-        
-    }
-    
-    private func loadFromDisk(_ url: NSString) -> UIImage? {
-        //todo
-        return nil
-    }
-    
-    private func currentDiskCacheSize() -> Int64{
-        //todo
-        return 0
-    }
-    
-    private func mkdir() -> URL? {
-        let paths = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
-        
-        if (paths.count <= 0) {
-            return nil
-        }
-        
-        let path = paths[0]
-        
-        guard let pathUrl = URL(string: path) else {
-            return nil
-        }
 
-        let fullPath = pathUrl.appendingPathComponent("cache")
-        if !FileManager.default.fileExists(atPath: fullPath.path) {
-            do {
-                try FileManager.default.createDirectory(atPath: fullPath.path, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print(error.localizedDescription)
-                return nil
-            }
-        }
-        
-        return fullPath
-    }
 }
