@@ -10,7 +10,7 @@ import Foundation
 
 extension String {
     
-    func percentEncoding() -> String? {
-        return self.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+    func base64Encoding() -> String? {
+        return self.data(using: .utf8)?.base64EncodedString()
     }
 }

@@ -12,25 +12,23 @@ class ImageMemCache {
     
     public static let shared = ImageMemCache()
     
-    var memoryCacheSize = {
-        return 50 * 1024 * 1024 // 50MB
-    }
+    var memoryCacheSize = 10//50 * 1024 * 1024 // 50MB
     
     var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
     
     init() {
         // allocate memory cache size
-        images.totalCostLimit = memoryCacheSize()
+        images.totalCostLimit = memoryCacheSize
     }
     
     
-    func saveToMemory(image: UIImage, url: NSString) {
-        images.setObject(image, forKey: url)
+    func saveToMemory(image: UIImage, url: String) {
+        images.setObject(image, forKey: NSString(string: url))
     }
     
     
-    func loadFromMemory(url: NSString) -> UIImage? {
-        images.object(forKey: url)
+    func loadFromMemory(url: String) -> UIImage? {
+        images.object(forKey: NSString(string: url))
     }
     
 }
