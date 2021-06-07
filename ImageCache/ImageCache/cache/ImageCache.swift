@@ -11,12 +11,12 @@ class ImageCache {
     
     public static let shared = ImageCache()
     
-    let diskCache = ImageDiskCache.shared
-    let memCache = ImageMemCache.shared
+    private let diskCache = ImageDiskCache.shared
+    private let memCache = ImageMemCache.shared
     
-    let queue = DispatchQueue(label: "cache")
+    private let queue = DispatchQueue(label: "cache")
 
-    init() {
+    private init() {
     }
     
     // save image

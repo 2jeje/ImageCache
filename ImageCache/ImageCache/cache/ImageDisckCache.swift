@@ -9,19 +9,17 @@ import UIKit
 
 class ImageDiskCache {
    
-    public static let shared = ImageDiskCache()
+    internal static let shared = ImageDiskCache()
     
-    var diskPath: URL?
+    private var diskPath: URL?
+    private var disckCacheSize: UInt64 = UInt64(100 * 1024 * 1024) // 100MB
+    private var currentDiskCacheSize: UInt64 = 0
     
-    var disckCacheSize: UInt64 = UInt64(100 * 1024 * 1024) // 100MB
-
-    var currentDiskCacheSize: UInt64 = 0
-    
-    init() {
+    private init() {
         loadDiskCache()
     }
 
-    func saveToDisk(image: UIImage, url: String) {
+    internal func saveToDisk(image: UIImage, url: String) {
         guard let cacheDefaultUrl = diskPath else {
             return
         }
@@ -55,7 +53,7 @@ class ImageDiskCache {
         print("currentDiskCacheSize: \(currentDiskCacheSize)")
     }
 
-    func loadFromDisk(url: String) -> UIImage? {
+    internal func loadFromDisk(url: String) -> UIImage? {
         guard let cacheDefaultUrl = diskPath else {
             return nil
         }
@@ -128,13 +126,13 @@ class ImageDiskCache {
     }
 }
 
-struct DiskCache {
+fileprivate struct DiskCache {
     var createAt: UInt64
     var size: UInt64
     var path: URL
 }
 
-class DiskCacheStorage {
+fileprivate class DiskCacheStorage {
 
     var caches: [DiskCache] = []
 
@@ -145,6 +143,7 @@ class DiskCacheStorage {
     }
 
     func sort() {
+        //todo
     }
 
     func push(cache: DiskCache) {

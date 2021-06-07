@@ -8,26 +8,28 @@
 import UIKit
 
 
-class ImageMemCache {
+internal class ImageMemCache {
     
-    public static let shared = ImageMemCache()
+    internal static let shared = ImageMemCache()
     
-    var memoryCacheSize = 10//50 * 1024 * 1024 // 50MB
+    private var memoryCacheSize = 50 * 1024 * 1024 // 50MB
     
-    var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
+    private var images = NSCache<NSString, UIImage>() // NSCache is Thread-Safe
     
-    init() {
+    private init() {
         // allocate memory cache size
         images.totalCostLimit = memoryCacheSize
     }
     
     
-    func saveToMemory(image: UIImage, url: String) {
-        images.setObject(image, forKey: NSString(string: url))
+    internal func saveToMemory(image: UIImage, url: String) {
+        if let data = image.pngData(){
+            images.setObject(image, forKey: NSString(string: url), cost: data.count)
+        }
     }
     
     
-    func loadFromMemory(url: String) -> UIImage? {
+    internal func loadFromMemory(url: String) -> UIImage? {
         images.object(forKey: NSString(string: url))
     }
     
