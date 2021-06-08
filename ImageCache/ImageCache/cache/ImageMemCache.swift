@@ -21,7 +21,6 @@ internal class ImageMemCache {
         images.totalCostLimit = memoryCacheSize
     }
     
-    
     internal func saveToMemory(image: UIImage, url: String) {
         if let data = image.pngData(){
             images.setObject(image, forKey: NSString(string: url), cost: data.count)

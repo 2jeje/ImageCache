@@ -12,15 +12,12 @@ class ImageCache {
     internal static let shared = ImageCache()
     private let diskCache = ImageDiskCache.shared
     private let memCache = ImageMemCache.shared
-    
-    private let queue = DispatchQueue(label: "cache")
-    
+    private let queue = DispatchQueue(label: "kakaoCache")
     private var isDiskCacheEnabled = false
 
     private init() {
     }
     
-    // load image
     func loadImage(url: URL, completion: @escaping ((UIImage?) -> Void) ) {
         
         guard let encodedUrl = url.path.base64Encoding() else {
@@ -38,39 +35,51 @@ class ImageCache {
                 }
             }
             else {
-                print("try disk cache")
                 if self?.isDiskCacheEnabled == true {
-                    let image = self?.diskCache.loadFromDisk(url :encodedUrl)
-                    DispatchQueue.main.async {
-                        completion(image)
-                    }
-                }
-                else {
-                    do {
-                        let data = try Data(contentsOf: url)
-                        
-                        if let image = UIImage(data: data) {
-                            self?.saveImage(image: image, url: encodedUrl)
-                            DispatchQueue.main.async {
-                                completion(image)
-                            }
-                        }
-                    } catch  {
+                    print("try disk cache")
+                    if let diskImage = self?.diskCache.loadFromDisk(url :encodedUrl) {
                         DispatchQueue.main.async {
-                            completion(nil)
+                            completion(diskImage)
                         }
+                    }
+                    else {
+                        self?.handleNoImageCache(url: url, encodedUrl: encodedUrl, completion: completion)
                     }
 
+                }
+                else {
+                    self?.handleNoImageCache(url: url, encodedUrl: encodedUrl, completion: completion)
                 }
            }
         }
     }
     
-    // save image
-    private func saveImage(image: UIImage, url: String) {
-        guard let encodedUrl = url.base64Encoding() else { return }
+    private func handleNoImageCache(url: URL, encodedUrl: String, completion: @escaping ((UIImage?) -> Void)) {
         
-        // save to memory and disk
+        if let image = self.downloadImage(url: url) {
+            self.saveImage(image: image, encodedUrl: encodedUrl)
+            DispatchQueue.main.async {
+                completion(image)
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+        }
+    }
+    
+    private func downloadImage(url: URL) -> UIImage? {
+        do {
+            let data = try Data(contentsOf: url)
+            return UIImage(data: data)
+        } catch {
+            print(error)
+        }
+        return nil
+    }
+    
+    private func saveImage(image: UIImage, encodedUrl: String) {
         queue.async { [weak self] in
             self?.memCache.saveToMemory(image: image, url: encodedUrl)
             if self?.isDiskCacheEnabled ?? false{
