@@ -31,10 +31,12 @@ class ImageDiskCache {
             let size = currentDiskCacheSize + UInt64(data.count)
             print("fileSize: \(UInt64(data.count))")
             if (size >= disckCacheSize) {
-                // 삭제
                 repeat {
                     if let cache = DiskCacheStorage.shared.pop() {
                         currentDiskCacheSize -= cache.size
+                        if currentDiskCacheSize < 0 {
+                            currentDiskCacheSize = 0
+                        }
                         removeFile(url: cache.path)
                     }
 
@@ -42,11 +44,10 @@ class ImageDiskCache {
             }
 
             do {
-              //  print("write: \(cacheUrl)")
                 try data.write(to: cacheUrl, options: Data.WritingOptions.atomic)
 
             } catch let error {
-                debugPrint(error.localizedDescription)
+                debugPrint(error)
             }
         }
         
@@ -70,17 +71,14 @@ class ImageDiskCache {
             print(error)
         }
     }
-//
+    
     private func mkdir() -> URL? {
         let paths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
-        if (paths.count <= 0) {
-            return nil
-        }
-        var path = paths[0]
+        guard var path = paths.first else { return nil }
+        
         path.appendPathComponent("cache", isDirectory: true)
 
         if !FileManager.default.fileExists(atPath: path.path) {
-            print("DDDD")
             do {
                 try FileManager.default.createDirectory(atPath: path.path, withIntermediateDirectories: false, attributes: nil)
             } catch {
@@ -94,17 +92,19 @@ class ImageDiskCache {
 
     private func loadDiskCache(){
         diskPath = mkdir()
-
+        
         guard let path = diskPath else { return }
+        
         var files: [String] = []
-
         do {
-            files = try FileManager.default.contentsOfDirectory(atPath: diskPath!.path)
+            files = try FileManager.default.contentsOfDirectory(atPath: path.path)
         }
         catch {
             print(error)
             return
         }
+        
+        print(files)
         
         currentDiskCacheSize = 0
         for file in files {
@@ -112,7 +112,7 @@ class ImageDiskCache {
             do {
                 let fileAttr = try FileManager.default.attributesOfItem(atPath: filePath.path)
                 if let size = fileAttr[FileAttributeKey.size] as? UInt64, let createdAt = fileAttr[FileAttributeKey.creationDate] as? Date {
-                    DiskCacheStorage.shared.load(cache: DiskCache(createAt: UInt64(createdAt.timeIntervalSince1970), size: size, path: filePath))
+                    DiskCacheStorage.shared.load(cache: DiskCache(createdAt: UInt64(createdAt.timeIntervalSince1970), size: size, path: filePath))
                     currentDiskCacheSize += size
                 }
             }
@@ -123,11 +123,13 @@ class ImageDiskCache {
         }
 
         DiskCacheStorage.shared.sort()
+        
+        print(DiskCacheStorage.shared.caches)
     }
 }
 
 fileprivate struct DiskCache {
-    var createAt: UInt64
+    var createdAt: UInt64
     var size: UInt64
     var path: URL
 }
@@ -143,18 +145,16 @@ fileprivate class DiskCacheStorage {
     }
 
     func sort() {
-        //todo
+        caches.sort(by:{ $0.createdAt < $1.createdAt})
     }
 
     func push(cache: DiskCache) {
         self.caches.append(cache)
-        // todo sorting
     }
 
     func pop() -> DiskCache? {
-        if caches.count <= 0 { return nil }
-        let first = caches.first
+        guard let cache = caches.first else { return nil }
         caches.remove(at: 0)
-        return first
+        return cache
     }
 }

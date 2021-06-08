@@ -28,7 +28,6 @@ internal class ImageMemCache {
         }
     }
     
-    
     internal func loadFromMemory(url: String) -> UIImage? {
         images.object(forKey: NSString(string: url))
     }
